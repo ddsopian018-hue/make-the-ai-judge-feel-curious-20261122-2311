@@ -37,6 +37,10 @@ def _check(text: str) -> int:
         raise SystemExit(f"entry text is {size} code points, must be 1-280")
     if not text.strip():
         raise SystemExit("entry text must not be whitespace only")
+    if text != text.strip():
+        raise SystemExit("entry text must not start or end with whitespace")
+    if "  " in text:
+        raise SystemExit("entry text must not contain a double space")
     return size
 
 
@@ -49,6 +53,12 @@ def main() -> None:
     target = os.path.join(out_dir, "entry.txt")
     with open(target, "w", encoding="utf-8") as handle:
         handle.write(TEXT)
+
+    # Round-trip guard: what the grader reads must be exactly the text.
+    with open(target, "r", encoding="utf-8") as handle:
+        written = handle.read()
+    if written != TEXT:
+        raise SystemExit("entry.txt round-trip mismatch")
 
     print(f"wrote {size} code points to {target}")
 
